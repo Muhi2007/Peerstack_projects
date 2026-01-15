@@ -108,6 +108,22 @@ int is_valid_stu_str(const char *name){
     return 1;
 }
 
+void dict_free(StudentDictionary *dict){
+    for (int i = 0; i<TABLE_LENGTH; i++){
+        NodeStudent *curr = dict->arrayStudents[i];
+        while (curr != NULL){
+            NodeStudent *temp = curr->next;
+            if (curr->student != NULL){
+                free(curr->student);
+            }
+            free(curr);
+            curr = temp;
+        }
+        dict->arrayStudents[i] = NULL;
+    }
+
+    printf("Success: Dictionary cleared");
+}
 
 //-----------------------Main--------------------------//
 int main(){
@@ -183,6 +199,7 @@ int main(){
     }
 
     saveUsers(&id_Dict, fName);
+    dict_free(&id_Dict);
     printf("Goodbye!");
     return 0;
 }
