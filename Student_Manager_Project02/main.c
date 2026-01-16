@@ -28,6 +28,10 @@ int convert_valid_key(const unsigned int id){
     return id % TABLE_LENGTH;
 }
 
+void student_print(const Student *stu){
+    printf("%u, %s, %s, %u \n", stu->ID, stu->name, stu->surname, stu->age);
+}
+
 void dict_insert(StudentDictionary *dict, unsigned int id, Student *newStu){
     unsigned int index = convert_valid_key(id);
 
@@ -38,6 +42,20 @@ void dict_insert(StudentDictionary *dict, unsigned int id, Student *newStu){
 
     newNode->next = dict->arrayStudents[index];//Assigns the newNode to the start
     dict->arrayStudents[index] = newNode;//Then makes the dictionary's index point to our new node (in other words start of linked list)
+}
+
+void dict_print(const StudentDictionary dict){
+    printf("ID, NAME, SURNAME, AGE\n");
+    for (int i = 0; i<TABLE_LENGTH; i++){
+        NodeStudent *curr = dict.arrayStudents[i];
+        while (curr != NULL){
+            NodeStudent *temp = curr->next;
+            if (curr->student != NULL){
+                student_print(curr->student);
+            }
+            curr = temp;
+        }
+    }
 }
 
 unsigned int loadUsers(StudentDictionary *dict ,const char *fName){
@@ -122,17 +140,25 @@ void dict_free(StudentDictionary *dict){
         dict->arrayStudents[i] = NULL;
     }
 
-    printf("Success: Dictionary cleared");
+    printf("Success: Dictionary cleared\n");
 }
 
 //-----------------------Main--------------------------//
-int main(){
-    const char *fName = "students.csv";
+int main(int argc, char *argv[]){//Just for getting the name of the file from user
+    const char *fName = "student.csv";
+    if (argc >= 2){
+        fName = argv[1];
+    }
+    
     int choice = 0;
     StudentDictionary id_Dict;
     for (int i = 0; i<TABLE_LENGTH; i++) { //For initilizing all the values with Null or 0
         id_Dict.arrayStudents[i] = NULL;
     }
+
+    FILE *fptr = fopen(fName, "r");//If the file does not exists, this file will create it
+    fclose(fptr);
+
 
     unsigned int start_id = loadUsers(&id_Dict, fName);
     if (start_id == 0) return 1; //Kills program if loadUsers() returns error message
@@ -184,7 +210,7 @@ int main(){
             printf("Delete User\n");
             break;
         case 3:
-            printf("Show Users\n");
+            dict_print(id_Dict);
             break;
         case 4:
             printf("Update User\n");
